@@ -141,6 +141,7 @@ a { color: inherit; }
 .social-icons a {
   display: inline-flex;
   color: inherit;
+  text-decoration: none;
 }
 
 .social-icons svg {
