@@ -129,10 +129,22 @@ a { color: inherit; }
   line-height: 1.8;
 }
 
-.ig {
-  display: inline-flex;
+.social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
   margin-top: 18px;
   color: var(--ink);
+}
+
+.social-icons a {
+  display: inline-flex;
+  color: inherit;
+}
+
+.social-icons svg {
+  display: block;
 }
 
 .portrait {
@@ -176,7 +188,7 @@ a { color: inherit; }
 
 .social a:hover,
 .wordmark a:hover,
-.ig:hover { opacity: 0.6; }
+.social-icons a:hover { opacity: 0.6; }
 
 #lightbox {
   border: 0;
