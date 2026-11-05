@@ -13,8 +13,18 @@
 <body>
   <div class="page">
     <header class="banner">
-      <p class="wordmark"><a href="#top">LEA LIU<br>Tanuko</a></p>
-      <p class="tagline">Illustrator &amp; Fashion Concept Artist</p>
+      <button class="banner-toggle" type="button" aria-expanded="false" aria-controls="section-nav">
+        <span class="wordmark">LEA LIU<br>Tanuko</span>
+        <span class="tagline">Illustrator &amp; Fashion Concept Artist</span>
+      </button>
+      <nav id="section-nav" class="section-nav" aria-label="Sections" inert>
+        <div class="section-nav-inner">
+          <a href="#illustrations">Illustrations</a>
+          <a href="#events">Previous Events</a>
+          <a href="#merchandise">Merchandise</a>
+          <a href="#about">About Me</a>
+        </div>
+      </nav>
     </header>
 
     <main id="top">
@@ -38,7 +48,7 @@
 
       <section class="block" id="events">
         <div class="section-head">
-          <h2>Previous Event</h2>
+          <h2>Previous Events</h2>
           <p>AX 2024 / Seoul Illustration 2024 / SJ Made Holiday Fair / LightBox 2023 / FanExpo 2023 etc.</p>
         </div>
         <div class="grid">
@@ -161,6 +171,24 @@
     <button class="next" type="button" aria-label="Next">›</button>
   </dialog>
   <script>
+    const banner = document.querySelector(".banner");
+    const bannerToggle = document.querySelector(".banner-toggle");
+    const sectionNav = document.querySelector("#section-nav");
+
+    function setNavOpen(open) {
+      banner.classList.toggle("is-open", open);
+      bannerToggle.setAttribute("aria-expanded", String(open));
+      sectionNav.inert = !open;
+    }
+
+    bannerToggle.addEventListener("click", () => {
+      setNavOpen(!banner.classList.contains("is-open"));
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setNavOpen(false);
+    });
+
     const dialog = document.querySelector("#lightbox");
     const view = dialog.querySelector("img");
     const tiles = [...document.querySelectorAll(".tile img")];
