@@ -18,12 +18,8 @@
     </header>
 
     <main class="collections" aria-label="Collections">
-      <a class="collection" href="egl/">
-        <div class="collection-collage" aria-hidden="true">
-          <img class="piece piece-a" src="site/landing/egl-01.jpg" alt="" loading="eager">
-          <img class="piece piece-b" src="site/landing/egl-02.jpg" alt="" loading="eager">
-          <img class="piece piece-c" src="site/landing/egl-03.jpg" alt="" loading="eager">
-        </div>
+      <a class="collection" href="egl/" data-source="egl/" data-fallback="site/landing/egl-01.jpg,site/landing/egl-02.jpg,site/landing/egl-03.jpg">
+        <div class="collection-stage" aria-hidden="true"></div>
         <div class="collection-label">
           <h2>Leatanuko’s Wardrobes</h2>
           <p>EGL Fashion Art</p>
@@ -31,12 +27,8 @@
         </div>
       </a>
 
-      <a class="collection" href="genshin/">
-        <div class="collection-collage genshin-collage" aria-hidden="true">
-          <img class="piece piece-a" src="site/landing/genshin-01.jpg" alt="" loading="eager">
-          <img class="piece piece-b" src="site/landing/genshin-02.jpg" alt="" loading="eager">
-          <img class="piece piece-c" src="site/landing/genshin-03.jpg" alt="" loading="eager">
-        </div>
+      <a class="collection" href="genshin/" data-source="genshin/" data-fallback="site/landing/genshin-01.jpg,site/landing/genshin-02.jpg,site/landing/genshin-03.jpg">
+        <div class="collection-stage" aria-hidden="true"></div>
         <div class="collection-label">
           <h2>LeaSnezhevna</h2>
           <p>Genshin Fan Art</p>
@@ -45,5 +37,221 @@
       </a>
     </main>
   </div>
+
+  <noscript>
+    <style>
+      .collection[href="egl/"] .collection-stage,
+      .collection[href="genshin/"] .collection-stage {
+        background:
+          url("site/landing/egl-01.jpg") center / cover no-repeat;
+      }
+      .collection[href="genshin/"] .collection-stage {
+        background-image: url("site/landing/genshin-01.jpg");
+      }
+    </style>
+  </noscript>
+
+  <script>
+    (() => {
+      const SLOT_COUNT = 4;
+      const FADE_MS = 1100;
+      const HOLD_MIN = 3800;
+      const HOLD_MAX = 7800;
+      const GAP_MIN = 700;
+      const GAP_MAX = 2800;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const rand = (min, max) => min + Math.random() * (max - min);
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      function resolveUrl(src, base) {
+        try {
+          return new URL(src, base).href;
+        } catch {
+          return src;
+        }
+      }
+
+      async function loadPool(collection) {
+        const fallback = (collection.dataset.fallback || "")
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .map((src) => resolveUrl(src, document.baseURI));
+
+        try {
+          const response = await fetch(collection.dataset.source, { cache: "force-cache" });
+          if (!response.ok) throw new Error("source fetch failed");
+          const html = await response.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const pageUrl = new URL(collection.dataset.source, document.baseURI);
+          const images = [...doc.querySelectorAll("#illustrations img")]
+            .map((img) => resolveUrl(img.getAttribute("src"), pageUrl))
+            .filter(Boolean);
+          return images.length ? images : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function preload(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      function chooseSrc(pool, active, recent) {
+        const blocked = new Set([...active, ...recent]);
+        const available = pool.filter((src) => !blocked.has(src));
+        return pick(available.length ? available : pool);
+      }
+
+      function placePiece(piece, stage, zIndex, naturalWidth, naturalHeight) {
+        const stageW = Math.max(stage.clientWidth, 1);
+        const stageH = Math.max(stage.clientHeight, 1);
+        const wide = stageW > 520;
+        const aspect = Math.max(naturalWidth, 1) / Math.max(naturalHeight, 1);
+        let widthPct;
+        let heightPct;
+
+        if (aspect >= 1) {
+          widthPct = rand(wide ? 38 : 46, wide ? 62 : 72);
+          heightPct = ((widthPct / 100) * stageW / aspect) / stageH * 100;
+          if (heightPct > 68) {
+            heightPct = 68;
+            widthPct = ((heightPct / 100) * stageH * aspect) / stageW * 100;
+          }
+        } else {
+          heightPct = rand(wide ? 40 : 44, wide ? 62 : 68);
+          widthPct = ((heightPct / 100) * stageH * aspect) / stageW * 100;
+          if (widthPct > 58) {
+            widthPct = 58;
+            heightPct = ((widthPct / 100) * stageW / aspect) / stageH * 100;
+          }
+        }
+
+        const left = rand(-6, Math.max(4, 100 - widthPct + 6));
+        const top = rand(-6, Math.max(8, 72 - heightPct + 6));
+        const rotate = rand(-5.5, 5.5);
+
+        piece.style.width = `${widthPct}%`;
+        piece.style.height = "auto";
+        piece.style.left = `${left}%`;
+        piece.style.top = `${top}%`;
+        piece.style.zIndex = String(zIndex);
+        piece.style.setProperty("--start-scale", rand(0.96, 1.02).toFixed(3));
+        piece.style.setProperty("--end-scale", rand(1.06, 1.14).toFixed(3));
+        piece.style.setProperty("--rotate", `${rotate.toFixed(2)}deg`);
+      }
+
+      async function showStatic(stage, pool) {
+        const chosen = [];
+        while (chosen.length < Math.min(3, pool.length)) {
+          const next = chooseSrc(pool, chosen, []);
+          chosen.push(next);
+        }
+
+        for (let index = 0; index < chosen.length; index += 1) {
+          try {
+            const loaded = await preload(chosen[index]);
+            const piece = document.createElement("img");
+            piece.className = "float-piece is-static";
+            piece.src = chosen[index];
+            piece.alt = "";
+            piece.decoding = "async";
+            placePiece(piece, stage, index + 1, loaded.naturalWidth, loaded.naturalHeight);
+            piece.style.opacity = "1";
+            stage.appendChild(piece);
+          } catch {
+            // skip broken fallback images
+          }
+        }
+      }
+
+      async function runSlot(stage, pool, active, recent, layer, slotIndex) {
+        const piece = document.createElement("img");
+        piece.className = "float-piece";
+        piece.alt = "";
+        piece.decoding = "async";
+        stage.appendChild(piece);
+
+        await wait(slotIndex * 1500 + rand(200, 1400));
+
+        while (document.contains(stage)) {
+          if (document.hidden) {
+            await wait(400);
+            continue;
+          }
+
+          const src = chooseSrc(pool, active, recent);
+          let loaded;
+          try {
+            loaded = await preload(src);
+          } catch {
+            await wait(800);
+            continue;
+          }
+
+          layer.value += 1;
+          placePiece(piece, stage, layer.value, loaded.naturalWidth, loaded.naturalHeight);
+          piece.src = src;
+          active.add(src);
+          recent.push(src);
+          if (recent.length > Math.max(3, Math.floor(pool.length / 3))) recent.shift();
+
+          piece.classList.remove("is-leaving");
+          piece.classList.add("is-visible");
+
+          const hold = rand(HOLD_MIN, HOLD_MAX) + slotIndex * rand(120, 480);
+          const started = performance.now();
+          while (performance.now() - started < hold) {
+            if (document.hidden) await wait(400);
+            else await wait(200);
+          }
+
+          // Keep roughly 3 images on screen: delay fade-out if too few remain.
+          while (document.contains(stage)) {
+            const visible = stage.querySelectorAll(".float-piece.is-visible:not(.is-leaving)").length;
+            if (visible > 2 || performance.now() - started > HOLD_MAX + 3200) break;
+            await wait(350);
+          }
+
+          piece.classList.add("is-leaving");
+          piece.classList.remove("is-visible");
+          await wait(FADE_MS);
+          active.delete(src);
+          piece.removeAttribute("src");
+          await wait(GAP_MIN + slotIndex * 180 + rand(0, GAP_MAX - GAP_MIN));
+        }
+      }
+
+      async function startCollection(collection) {
+        const stage = collection.querySelector(".collection-stage");
+        if (!stage) return;
+
+        const pool = await loadPool(collection);
+        if (!pool.length) return;
+
+        if (reduceMotion) {
+          showStatic(stage, pool);
+          return;
+        }
+
+        const active = new Set();
+        const recent = [];
+        const layer = { value: 0 };
+        const slots = Math.min(SLOT_COUNT, pool.length);
+        for (let i = 0; i < slots; i += 1) {
+          runSlot(stage, pool, active, recent, layer, i);
+        }
+      }
+
+      document.querySelectorAll(".collection[data-source]").forEach(startCollection);
+    })();
+  </script>
 </body>
 </html>
