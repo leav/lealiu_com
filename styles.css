@@ -169,6 +169,23 @@ a { color: inherit; }
   opacity: 1;
 }
 
+.collection[href="genshin/"] {
+  background: #44466d;
+  color: #fbf2ed;
+}
+
+.collection[href="genshin/"] .collection-stage {
+  background: linear-gradient(160deg, #4a4c74 0%, #3c3e63 100%);
+}
+
+.collection[href="genshin/"] .collection-label {
+  background: linear-gradient(180deg, rgba(68, 70, 109, 0) 0%, rgba(68, 70, 109, 0.88) 38%, rgba(68, 70, 109, 0.97) 100%);
+}
+
+.collection[href="genshin/"] .float-piece {
+  box-shadow: 0 14px 36px rgba(20, 22, 48, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .float-piece,
   .collection-cta {

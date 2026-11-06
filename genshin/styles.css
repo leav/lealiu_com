@@ -1,5 +1,6 @@
 :root {
-  --ink: #060d41;
+  --ink: #fbf2ed;
+  --bg: #44466d;
   --gap: 12px;
   --page: min(1680px, calc(100% - 48px));
 }
@@ -10,7 +11,7 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: #fff;
+  background: var(--bg);
   color: var(--ink);
   font-family: "Jost", Futura, "Century Gothic", "Trebuchet MS", sans-serif;
   font-weight: 400;
@@ -168,7 +169,7 @@ a { color: inherit; }
   margin: 0 0 var(--gap);
   padding: 0;
   border: 0;
-  background: #f3f3f3;
+  background: #383a5c;
   cursor: zoom-in;
   break-inside: avoid;
 }
@@ -275,7 +276,7 @@ a { color: inherit; }
 }
 
 #lightbox::backdrop {
-  background: rgba(6, 13, 65, 0.88);
+  background: rgba(68, 70, 109, 0.92);
 }
 
 #lightbox img {
@@ -289,7 +290,7 @@ a { color: inherit; }
   position: fixed;
   border: 0;
   background: transparent;
-  color: #fff;
+  color: #fbf2ed;
   font: 300 42px/1 "Jost", sans-serif;
   cursor: pointer;
 }
