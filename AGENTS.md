@@ -4,6 +4,11 @@
 
 这个文件给所有编程助手用，不限于某一种编辑器。
 
+网站结构：
+- `/`：总入口，选择两个作品集
+- `/egl/`：Leatanuko’s Wardrobes（EGL 时尚插画）
+- `/genshin/`：LeaSnezhevna（Genshin 同人）
+
 ## 她一说要改网站，先介绍流程
 
 在这一次对话里，她第一次表示要改网站时，回复的最前面先写下面这段，不要改写，也不要先改文件。这次对话里已经介绍过，就不要再重复。
@@ -14,10 +19,15 @@
 可以。改这个网站是这样：
 
 - 单纯加图片：把图片放进对应文件夹，然后告诉我。
+  EGL（Leatanuko’s Wardrobes）：
   - content/illustrations/：插画
   - content/events/：过往活动照片
   - content/merchandise/：商品和周边
   - content/about/：About Me 的个人照片
+  Genshin（LeaSnezhevna）：
+  - content/genshin/illustrations/：插画
+  - content/genshin/events/：过往活动照片
+  - content/genshin/about/：系列介绍旁的个人照片
   我会帮你加上序号，并放进网页。你也可以告诉我插在哪两张图之间。
 - 其他修改：直接跟我说你想改成什么样。
 - 改完之后说【发布】。我会帮你 commit，并推送到 GitHub。
@@ -29,23 +39,39 @@
 
 网页实际用的是 `site/` 里同名栏目的 JPEG，最长边 1600。新文件用该栏目下一个两位编号，例如已有 `12.jpg` 就用 `13.jpg`。
 
+EGL 示例：
+
 ```bash
 sips -s format jpeg -s formatOptions 82 -Z 1600 原图路径 --out site/illustrations/13.jpg
 ```
 
-然后在 `index.html` 里对应栏目的 `<div class="grid">` 中加一行。没说位置就加在该栏目最后。说了「最前面」或「插在某两张之间」就照那个位置放。不要为了插入去重命名后面已有的文件。网页顺序以这里的先后为准。
+然后在 `egl/index.html` 里对应栏目的 `<div class="grid">` 中加一行。路径写成 `../site/...`。
 
 ```html
-<button class="tile" type="button"><img src="site/illustrations/13.jpg" alt="简短名字" style="object-position: 50% 50%" loading="lazy"></button>
+<button class="tile" type="button"><img src="../site/illustrations/13.jpg" alt="简短名字" style="object-position: 50% 50%" loading="lazy"></button>
 ```
 
-换 About 的个人照片时，保留原图在 `content/about/`，并覆盖 `site/about/01.jpg`。不用改 `index.html` 里的图片地址。
+Genshin 示例：
+
+```bash
+sips -s format jpeg -s formatOptions 82 -Z 1600 原图路径 --out site/genshin/illustrations/38.jpg
+```
+
+然后在 `genshin/index.html` 里对应栏目的 `<div class="masonry">` 中加一行。
+
+```html
+<button class="tile" type="button"><img src="../site/genshin/illustrations/38.jpg" alt="简短名字" loading="lazy"></button>
+```
+
+没说位置就加在该栏目最后。说了「最前面」或「插在某两张之间」就照那个位置放。不要为了插入去重命名后面已有的文件。网页顺序以这里的先后为准。
+
+换 EGL About 的个人照片时，保留原图在 `content/about/`，并覆盖 `site/about/01.jpg`。换 Genshin 系列肖像时，保留原图在 `content/genshin/about/`，并覆盖 `site/genshin/about/01.jpg`。不用改 HTML 里的图片地址。
 
 不用改 `content/manifest.json` 和 `content/preview.html`。
 
 ## 其他修改
 
-改简介、活动名单、页脚链接，只改 `index.html` 里对应的文字。改颜色、字号、间距，只改 `styles.css`。主色是 `#060d41`。
+改 EGL 简介、活动名单、页脚链接，只改 `egl/index.html`。改 Genshin 系列介绍与栏目文字，只改 `genshin/index.html`。改总入口外观，改根目录 `index.html` 和 `styles.css`。各作品集的颜色、字号、间距分别改 `egl/styles.css` 或 `genshin/styles.css`。主色是 `#060d41`。
 
 不要改 `lea-2014/`，也不要在首页加上它的链接。不要为了一张图重写整个页面。
 
