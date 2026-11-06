@@ -182,8 +182,8 @@ a { color: inherit; }
 
 .series {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.55fr);
-  gap: 48px 64px;
+  grid-template-columns: minmax(0, 42em) minmax(260px, 1fr);
+  gap: 48px 40px;
   align-items: start;
   margin-top: 72px;
   scroll-margin-top: 24px;
@@ -225,6 +225,7 @@ a { color: inherit; }
 
 .portrait {
   width: 100%;
+  max-width: 560px;
   height: auto;
   aspect-ratio: 431 / 592;
   object-fit: cover;
