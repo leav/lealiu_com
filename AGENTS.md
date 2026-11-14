@@ -81,4 +81,4 @@ sips -s format jpeg -s formatOptions 82 -Z 1600 原图路径 --out site/genshin/
 
 只有她说出【发布】时才 commit 并 push 到当前分支的 GitHub 远程。在那之前不要 commit，也不要 push。
 
-推送完成后告诉她：代码已经在 GitHub 上。`leatanuko.com` 目前仍指向 Wix，所以那个网址还不会变成新站。
+推送完成后告诉她：已经发布到 https://leatanuko.com/ 。页面通常一两分钟内会更新。
